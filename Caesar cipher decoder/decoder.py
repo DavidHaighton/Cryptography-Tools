@@ -52,18 +52,23 @@ def attempt(words:set, word_index=0, shift=0)->tuple:
 
 worked, shift = attempt(words)
 
-if worked:
-    plain_text = ''
+def shift_cipher(text:str,shift:int)->str:
+    plain_text =''
     for c in cipher_text:
         if c.isalpha():
-            plain_text+=shift_letter(c, shift)
+            plain_text += shift_letter(c,shift)
         else:
             plain_text+=c
             pass
         pass
-    print("The cipher worked. the plain text was shifted by {0} and the output text is \n{1}".format(shift,plain_text))
+    return plain_text
+
+if worked:
+    print("The cipher worked. the plain text was shifted by {0} and the output text is \n{1}".format(shift,shift_cipher(cipher_text,shift)))
     pass
 else:
-    print("The cannot be solved with this method or word bank")
+    print("The cannot be solved with this method or word bank Here are the possibilities")
+    for shift in range(0,26):
+        print('shift: {0}\t phrase: {1}'.format(shift,shift_cipher(cipher_text,shift)))
 print("Done")
 
