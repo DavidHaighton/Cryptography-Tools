@@ -14,6 +14,8 @@ public class DecoderFrame extends JFrame implements DecoderView
     private JTextArea plainTextArea=new JTextArea(),
             cipherTextArea = new JTextArea();
     private JPanel mappingPanel = new JPanel(), textPanel=new JPanel();
+    private JScrollPane  cipherPane,
+            plainPane;
     private List<CharacterMapPanel> mapPanels = new ArrayList<>(26);
     private Model model = new Model();
     private JMenuBar menuBar = new JMenuBar();
@@ -37,9 +39,11 @@ public class DecoderFrame extends JFrame implements DecoderView
 
         textPanel.setLayout(new GridLayout(2,1,1,3));
         textPanel.setBackground(Color.BLACK);
-        textPanel.add(cipherTextArea);
+        cipherPane = new JScrollPane(cipherTextArea);
+        textPanel.add(cipherPane);
         cipherTextArea.getDocument().addDocumentListener(new CipherHandler());
-        textPanel.add(plainTextArea);
+        plainPane = new JScrollPane(plainTextArea);
+        textPanel.add(plainPane);
         plainTextArea.setEditable(false);
         this.plainTextArea.setLineWrap(true);
         this.cipherTextArea.setLineWrap(true);
