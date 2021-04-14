@@ -10,6 +10,7 @@ public class FrequencyPanel extends JPanel
     letterLabel;
     private int count=0;
     private char character;
+    private final float populationFreq;
     JPanel graph = new JPanel()
     {
         @Override
@@ -19,18 +20,24 @@ public class FrequencyPanel extends JPanel
             {
                 totalCount=1;
             }
-            int width = (int)getWidth()*count/(totalCount);
+            int letterWidth = (int)getWidth()*count/(totalCount);
+            int populationWidth = (int)(getWidth()*populationFreq);
             g.setColor(Color.DARK_GRAY);
             g.fillRect(0,0,getWidth(),getHeight());
+
+            g.setColor(Color.ORANGE);
+            g.fillRect(0,0,populationWidth,getHeight());
+
             g.setColor(Color.GREEN);
-            g.fill3DRect(0,0,width,getHeight(),true);
+            g.fill3DRect(0,0,letterWidth,getHeight(),true);
 
         }
     };
 
-    public FrequencyPanel(char letter)
+    public FrequencyPanel(char letter, float populationFreq)
     {
         character = letter;
+        this.populationFreq = populationFreq/100;
         letterLabel = new JLabel(letter+"");
         countLabel = new JLabel("0");
 

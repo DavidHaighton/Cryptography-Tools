@@ -7,11 +7,20 @@ import java.util.*;
 //read from file to get all english words and convert them into a map
 public class Model
 {
+    private final Map<Character,Float> population = new HashMap<>(26);
     private List<AnalyzerView> views = new ArrayList(1);
     private String selectedText = "";
     private Map<String, Map<Character,Integer>> cache = new TreeMap<>();
     public Model()
     {
+        //fill up the actual data of letters and their frequency
+        Scanner histoReader = new Scanner(getClass().getResourceAsStream("letter_histogram.txt"));
+        while (histoReader.hasNextLine())
+        {
+            String[] sides = histoReader.nextLine().split(":");
+            char letter = sides[0].charAt(0); float freq = Float.parseFloat(sides[1]);
+            population.put(letter,freq);
+        }
     }
 
     public void selectText(String text)
@@ -59,6 +68,11 @@ public class Model
         return mapping;
     }
 
+    public float getPopulationLetterFrequency(char letter)
+    {
+        return population.get(letter);
+    }
+
     public void removeView(AnalyzerView view)
     {
         this.removeView(view);
@@ -69,9 +83,5 @@ public class Model
         views.add(view);
     }
 
-    public void clear()
-    {
-        cache.clear();
-        selectedText = "";
-    }
+
 }

@@ -5,13 +5,14 @@ import java.awt.event.*;
 public class AnalyzerFrame extends JFrame implements AnalyzerView
 {
     private Model model = new Model();
-    private JTextArea cypher = new JTextArea();
+    private JTextArea cipherTextArea = new JTextArea();
     private JButton searchButton = new JButton("Search");
     private JPanel textPanel = new JPanel(),
     histogramPanel = new JPanel();
+    JScrollPane scrollPane = new JScrollPane(cipherTextArea);
     private JLabel selected = new JLabel("--selected--");
 
-    private List<FrequencyPanel> frequencyPanels = new ArrayList<>(27);
+    private java.util.List<FrequencyPanel> frequencyPanels = new ArrayList<>(27);
 
     public AnalyzerFrame()
     {
@@ -24,14 +25,16 @@ public class AnalyzerFrame extends JFrame implements AnalyzerView
         histogramPanel.setLayout(new GridLayout(26,1,0,1));
         for(int i=0;i<26;i++)
         {
-            frequencyPanels.add(new FrequencyPanel((char)('a'+i)));
+            char current = (char)('a'+i);
+            frequencyPanels.add(new FrequencyPanel(current, model.getPopulationLetterFrequency(current)));
             histogramPanel.add(frequencyPanels.get(frequencyPanels.size()-1));
         }
+        cipherTextArea.setLineWrap(true);
 
         textPanel.add(selected,BorderLayout.NORTH);
         textPanel.add(searchButton,BorderLayout.SOUTH);
         searchButton.addActionListener(new SearchHandler());
-        textPanel.add(cypher,BorderLayout.CENTER);
+        textPanel.add(scrollPane,BorderLayout.CENTER);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         model.addView(this);
 
@@ -63,11 +66,17 @@ public class AnalyzerFrame extends JFrame implements AnalyzerView
     {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String selected = cypher.getSelectedText();
+            String selected = cipherTextArea.getSelectedText();
             if(selected==null)
             {
                 selected="";
             }
+
+            if(selected.equals(""))
+            {
+                selected = cipherTextArea.getText();
+            }
+
             model.selectText(selected);
         }
     }
