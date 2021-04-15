@@ -1,8 +1,4 @@
 import java.util.*;
-/*
-*
-*
-* */
 public class Model
 {
     private String cipher="",

@@ -52,6 +52,9 @@ public class VigenereFrame extends JFrame implements PlainTextView
         this.add(plainScrollPane);
         plainTextArea.setEditable(false);
 
+        cipherTextArea.setLineWrap(true);
+        plainTextArea.setLineWrap(true);
+
         this.cipherTextArea.getDocument().addDocumentListener(new CipherHandler());
         this.keyField.getDocument().addDocumentListener(new KeyHandler());
         this.offsetSpinner.addChangeListener(e->{model.setKeyWrapOffset((int)offsetSpinner.getValue());});
