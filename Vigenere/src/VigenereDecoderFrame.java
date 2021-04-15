@@ -4,16 +4,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-public class VigenereFrame extends JFrame implements PlainTextView
+public class VigenereDecoderFrame extends JFrame implements PlainTextView
 {
-    private Model model = new Model();
+    private VigenereDecoderModel vigenereDecoderModel = new VigenereDecoderModel();
+    private VigenereGuessPopup popup = new VigenereGuessPopup();
 
     private JPanel keyPanel = new JPanel(), knownPanel = new JPanel();
     private TitledBorder keyBorder = new TitledBorder("Key"),
         cipherBorder = new TitledBorder("Cipher"),
         plainBorder = new TitledBorder("Plain Text");
 
-
+    private JMenuBar menuBar = new JMenuBar();
+    private JButton guesserButton = new JButton("Guesser");
 
     private JTextArea cipherTextArea = new JTextArea(),
             plainTextArea = new JTextArea();
@@ -22,13 +24,21 @@ public class VigenereFrame extends JFrame implements PlainTextView
 
     private JScrollPane cipherScrollPane = new JScrollPane(cipherTextArea),
             plainScrollPane = new JScrollPane(plainTextArea);
-    public VigenereFrame()
+    public VigenereDecoderFrame()
     {
         super("Vigenere Cipher Tool");
-        model.addPlainTextView(this);
+        vigenereDecoderModel.addPlainTextView(this);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new GridLayout(1,2,2,0));
         this.setBackground(Color.BLACK);
+
+        //menu bar
+        this.setJMenuBar(menuBar);
+        menuBar.add(guesserButton);
+        guesserButton.addActionListener(e->
+        {
+            popup.show(cipherTextArea.getText());
+        });
 
         //left side
         this.add(knownPanel);
@@ -57,7 +67,8 @@ public class VigenereFrame extends JFrame implements PlainTextView
 
         this.cipherTextArea.getDocument().addDocumentListener(new CipherHandler());
         this.keyField.getDocument().addDocumentListener(new KeyHandler());
-        this.offsetSpinner.addChangeListener(e->{model.setKeyWrapOffset((int)offsetSpinner.getValue());});
+        this.offsetSpinner.addChangeListener(e->{
+            vigenereDecoderModel.setKeyWrapOffset((int)offsetSpinner.getValue());});
 
         setSize(600,300);
         show();
@@ -71,7 +82,7 @@ public class VigenereFrame extends JFrame implements PlainTextView
     }
 
     public static void main(String[] args) {
-        new VigenereFrame();
+        new VigenereDecoderFrame();
     }
 
     private class CipherHandler implements DocumentListener
@@ -97,8 +108,8 @@ public class VigenereFrame extends JFrame implements PlainTextView
 
         private void updateCipher()
         {
-            model.setCipher(cipherTextArea.getText());
-            model.updatePlain();
+            vigenereDecoderModel.setCipher(cipherTextArea.getText());
+            vigenereDecoderModel.updatePlain();
         }
     }
 
@@ -124,8 +135,8 @@ public class VigenereFrame extends JFrame implements PlainTextView
         }
         private void updateCipher()
         {
-            model.setKey(keyField.getText());
-            model.updatePlain();
+            vigenereDecoderModel.setKey(keyField.getText());
+            vigenereDecoderModel.updatePlain();
         }
     }
 }

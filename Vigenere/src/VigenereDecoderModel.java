@@ -1,5 +1,5 @@
 import java.util.*;
-public class Model
+public class VigenereDecoderModel
 {
     private String cipher="",
     key="",
@@ -9,7 +9,7 @@ public class Model
 
     private int keyWrapOffset;
 
-    public Model()
+    public VigenereDecoderModel()
     {
     }
 
