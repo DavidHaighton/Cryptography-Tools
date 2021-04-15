@@ -47,7 +47,6 @@ public class VigenereDecoderFrame extends JFrame implements PlainTextView
         keyPanel.setBorder(keyBorder);
         keyPanel.setLayout(new BorderLayout());
         keyPanel.add(keyField,BorderLayout.CENTER);
-
         SpinnerNumberModel spinnerModel = new SpinnerNumberModel();
         spinnerModel.setStepSize(1);
         spinnerModel.setMinimum(0);
