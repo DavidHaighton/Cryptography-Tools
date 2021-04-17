@@ -18,5 +18,5 @@ The framework is fully commented and located in the package "core". To add a new
 <li>option 2: add the view to where all the other views are intantiated and located (to include with others)</li>
 </ol>
 
-<h2>Why></h2>
+<h2>Why?</h2>
 Having a tool like this allows ciphers to be cracked faster, algorithms to be tested/prototyped easier and allows for an easy way show off and use any algorithms you've created.
