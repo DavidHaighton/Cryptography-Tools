@@ -1,5 +1,6 @@
 package Core;
 
+import CaesarCipher.CaesarPane;
 import FrequencyAnalyzer.AnalyzerPane;
 import MonoAlphabetic.MonoAlphabeticPane;
 import Playfair.PlayfairPane;
@@ -112,7 +113,8 @@ public abstract class CryptoPane extends JComponent
             new AnalyzerPane(),
             new MonoAlphabeticPane(),
             new PlayfairPane(),
-            new VigenereCryptoPane()
+            new VigenereCryptoPane(),
+            new CaesarPane()
     };
 
 }

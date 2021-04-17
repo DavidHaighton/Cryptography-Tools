@@ -8,7 +8,7 @@ public class CaesarPane extends DefaultCryptoStringPane
 {
     public CaesarPane()
     {
-        super(new SymmetricModel(new Algorithm(),"","",""), SymCryptoPartType.ALL, SymCryptoPartType.KEY);
+        super(new SymmetricModel(new CaesarAlgorithm(),"","",""), SymCryptoPartType.ALL, SymCryptoPartType.KEY);
     }
 
     public static void main(String[] args)
