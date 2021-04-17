@@ -1,10 +1,12 @@
 package FrequencyAnalyzer;
+import Core.CryptoPane;
+
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class AnalyzerPane extends Core.DecoderPane implements AnalyzerView
+public class AnalyzerPane extends CryptoPane implements AnalyzerView
 {
     private Model model = new Model();
     private JTextArea cipherTextArea = new JTextArea();

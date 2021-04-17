@@ -1,6 +1,6 @@
 package Playfair;
 
-import Core.DecoderPane;
+import Core.CryptoPane;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -8,7 +8,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-public class PlayfairPane extends DecoderPane implements PlayfairView
+public class PlayfairPane extends CryptoPane implements PlayfairView
 {
     private Model model = new Model();
     private JPanel controlPanel = new JPanel(), keyPanel = new JPanel(), areaPanel = new JPanel();

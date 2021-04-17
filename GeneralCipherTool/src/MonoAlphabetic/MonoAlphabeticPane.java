@@ -1,4 +1,6 @@
 package MonoAlphabetic;
+import Core.CryptoPane;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -9,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MonoAlphabeticPane extends Core.DecoderPane implements DecoderView
+public class MonoAlphabeticPane extends CryptoPane implements DecoderView
 {
     private final String PREDICT="predict";
     private JTextArea plainTextArea=new JTextArea(),

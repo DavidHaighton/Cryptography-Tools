@@ -1,4 +1,4 @@
-import Core.DecoderPane;
+import Core.CryptoPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,14 +9,14 @@ public class CompleteCipherTool extends JFrame
     private JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
     private JMenuBar menuBar = new JMenuBar();
 
-    private DecoderPane panels[] = DecoderPane.decoderPanels;
+    private CryptoPane panels[] = CryptoPane.CRYPTO_PANELS;
 
     public CompleteCipherTool()
     {
         super("General Cipher Tool");
-        for(DecoderPane pane: panels)
+        for(CryptoPane pane: panels)
         {
-            tabbedPane.addTab(pane.getName(), null, pane, pane.getDescription());
+            tabbedPane.addTab(pane.getShortName(), null, pane, pane.getName());
         }
 
         this.setJMenuBar(menuBar);
@@ -35,12 +35,12 @@ public class CompleteCipherTool extends JFrame
     {
 
         menuBar.removeAll();
-        for(DecoderPane temp: this.panels)
+        for(CryptoPane temp: this.panels)
         {
             temp.setInFocus(false);
         }
 
-        DecoderPane pane =((DecoderPane)tabbedPane.getSelectedComponent());
+        CryptoPane pane =((CryptoPane)tabbedPane.getSelectedComponent());
         pane.setInFocus(true);
         for(JComponent component: pane.getMenus())
         {

@@ -1,11 +1,13 @@
 package Vigenere;
+import Core.CryptoPane;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-public class VigenereDecoderPane extends Core.DecoderPane implements PlainTextView
+public class VigenereCryptoPane extends CryptoPane implements PlainTextView
 {
     private VigenereDecoderModel vigenereDecoderModel = new VigenereDecoderModel();
     private VigenereGuessPopup popup = new VigenereGuessPopup();
@@ -24,7 +26,7 @@ public class VigenereDecoderPane extends Core.DecoderPane implements PlainTextVi
 
     private JScrollPane cipherScrollPane = new JScrollPane(cipherTextArea),
             plainScrollPane = new JScrollPane(plainTextArea);
-    public VigenereDecoderPane()
+    public VigenereCryptoPane()
     {
         super("Vigenere","Vigenere Tool");
         vigenereDecoderModel.addPlainTextView(this);
@@ -79,7 +81,7 @@ public class VigenereDecoderPane extends Core.DecoderPane implements PlainTextVi
     }
 
     public static void main(String[] args) {
-        new VigenereDecoderPane().showPopupFrame(JFrame.EXIT_ON_CLOSE);
+        new VigenereCryptoPane().showPopupFrame(JFrame.EXIT_ON_CLOSE);
     }
 
     @Override
