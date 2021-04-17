@@ -4,7 +4,7 @@ import Core.*;
 
 import javax.swing.*;
 
-public class CaesarPane extends DefaultCryptoStringPane
+public class CaesarPane extends DefaultAppStringPane
 {
     public CaesarPane()
     {

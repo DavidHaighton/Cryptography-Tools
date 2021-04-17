@@ -1,120 +1,159 @@
 package Core;
 
-import CaesarCipher.CaesarPane;
-import FrequencyAnalyzer.AnalyzerPane;
-import MonoAlphabetic.MonoAlphabeticPane;
-import Playfair.PlayfairPane;
-import Vigenere.VigenereCryptoPane;
-
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Standard Panel that all main cryptography panels must inherit from to be shown in the complete application
+ * This Pane is for any cryptographic protocols to be shown.
+ * The main difference between this pane and the last is this one allows for an easier time when implementing panes for algorithms
  */
-public abstract class CryptoPane extends JComponent
+public abstract class CryptoPane<Cipher, Key, Plain> extends AppPane implements ModelChangeListener
 {
-    private final String shortName, name;
-    private List<JComponent> menus = new ArrayList<>(4);
+    private final JMenu typeMenu = new JMenu("Solve for type");
+    private final JRadioButton keyButton = new JRadioButton("Key"),
+            cipherButton = new JRadioButton("Cipher"),
+            plainButton = new JRadioButton("Plain");
+    private final ButtonGroup typeGroup = new ButtonGroup();
 
+
+    private SymmetricModel model;
+    private SymCryptoPartType mode;
     /**
-     * Constructs DecoderPane
-     * @param shortName short short name of the algorithm
-     * @param name name of the algorithm
+     * Constructs the pane off of the model
+     * @param model the model
+     * @param acceptableModes which modes are acceptable
+     * @param mode the current mode
      */
-    public CryptoPane(String shortName, String name)
+    public CryptoPane(SymmetricModel<String,String,String> model, int acceptableModes, SymCryptoPartType mode)
     {
-        this.shortName = shortName;
-        this.name = name;
-    }
-
-    /**
-     * Called this panel is set in or out of focus.
-     * It should clean other windows up if it is out of focus and can display windows if it is in focus
-     * @param inFocus if the panel is in or out of focus
-     */
-    public abstract void setInFocus(boolean inFocus);
-
-    /**
-     * returns list of components to be put on Menu bar when set to focus
-     * @return list of components to be put on menu bar
-     */
-    public final List<JComponent> getMenus()
-    {
-        return this.menus;
-    }
-
-    /**
-     * adds menu to be put on menu bar when set to focus
-     * @param menu component
-     */
-    public final void addMenu(JComponent menu)
-    {
-        this.menus.add(menu);
-    }
-
-    /**
-     * removes menu to be put on menu bar when set to focus
-     * @param menu component
-     */
-    public final void removeMenu(JComponent menu)
-    {
-        this.menus.remove(menu);
+        super(model.getAlgorithm().getShortName(), model.getAlgorithm().getName());
+        //setup model
+        model.addModelListener(this);
+        this.model = model;
+        //sanitize input
+        if(acceptableModes>7||acceptableModes<1 || ((mode.value|acceptableModes)!=acceptableModes))
+        {
+            throw new IllegalArgumentException("the acceptable modes must contain the current mode");
+        }
+        //setup menu
+        this.mode = mode;
+        this.addMenu(typeMenu);
+        setupRadioButton(keyButton,SymCryptoPartType.KEY, acceptableModes);
+        setupRadioButton(cipherButton,SymCryptoPartType.CIPHER, acceptableModes);
+        setupRadioButton(plainButton,SymCryptoPartType.PLAIN, acceptableModes);
     }
 
 
     /**
-     * returns the short name of the algorithm
-     * @return the short name of the algorithm
+     * can setup up a radio button according to the following properties
+     * @param radioButton radiobutton to be setup
+     * @param mode the mode the radio button sets the app to
+     * @param acceptableModes the acceptable modes allowed
      */
-    public String getShortName()
+    private void setupRadioButton(JRadioButton radioButton, SymCryptoPartType mode,int acceptableModes)
     {
-        return this.shortName;
+        if((acceptableModes&mode.value)!=0)
+        {
+
+            typeMenu.add(radioButton);
+            radioButton.setSelected(true);
+            typeGroup.add(radioButton);
+            radioButton.addActionListener(e->{this.mode = mode; setTypeOutput(mode);});
+        }
+    }
+
+    protected void syncToModel()
+    {
+        setTypeOutput(mode);
+        model.sync();
+    }
+
+
+    /**
+     * called when the type of output changes  via the radio buttons
+     * @param type the type of output
+     */
+    private final void setTypeOutput(SymCryptoPartType type)
+    {
+        setKeyEnabled(type != SymCryptoPartType.KEY);
+        setCipherEnabled(type != SymCryptoPartType.CIPHER);
+        setPlainEnabled(type != SymCryptoPartType.PLAIN);
     }
 
     /**
-     * returns the name of the algorithm
-     * @return the name of the algorithm
+     * called when the the gui part should be enabled or disabled
+     * @param isEnabled if it should be disabled or enabled
+     */
+    protected void setKeyEnabled(boolean isEnabled){}
+    /**
+     * called when the the gui part should be enabled or disabled
+     * @param isEnabled if it should be disabled or enabled
+     */
+    protected void setCipherEnabled(boolean isEnabled){}
+    /**
+     * called when the the gui part should be enabled or disabled
+     * @param isEnabled if it should be disabled or enabled
+     */
+    protected void setPlainEnabled(boolean isEnabled){}
+
+
+    /**
+     * called when the model is changed
+     * @param event the event to trigger the change
      */
     @Override
-    public String getName()
+    public void modelChanged(ModelChangedEvent event)
     {
-        return name;
-    }
-
-
-    /**
-     * shows the decoder pane in a non-blocking pop up frame
-     * @param defaultClose what the frame should do when it closes (HINT: look at JFrame.)
-     */
-    public void showPopupFrame(int defaultClose)
-    {
-        JFrame frame = new JFrame(this.getName());
-        frame.setSize(this.getSize());
-        frame.setDefaultCloseOperation(defaultClose);
-        frame.add(this);
-        if(!this.getMenus().isEmpty())
+        String text = (String)event.getPart();
+        switch(getOutputMode())
         {
-            JMenuBar bar = new JMenuBar();
-            frame.setJMenuBar(bar);
-            for(JComponent component: this.getMenus())
-            {
-                bar.add(component);
-            }
+            case KEY:
+                updateKey(event);
+                break;
+            case PLAIN:
+                updatePlain(event);
+                break;
+            default:
+                updateCipher(event);
         }
-        frame.show();
     }
 
     /**
-     * DecoderPane that come with the application
+     * Called when the model changes this types value
+     * @param e the event that triggered it
      */
-    public static final CryptoPane[] CRYPTO_PANELS ={
-            new AnalyzerPane(),
-            new MonoAlphabeticPane(),
-            new PlayfairPane(),
-            new VigenereCryptoPane(),
-            new CaesarPane()
-    };
+    protected void updateKey(ModelChangedEvent e){}
+    /**
+     * Called when the model changes this types value
+     * @param e the event that triggered it
+     */
+    protected void updatePlain(ModelChangedEvent e){}
+    /**
+     * Called when the model changes this types value
+     * @param e the event that triggered it
+     */
+    protected void updateCipher(ModelChangedEvent e){}
+
+    /**
+     * returns the symmetric model
+     * @return the symmetric model
+     */
+    public SymmetricModel<Cipher, Key, Plain> getModel()
+    {
+        return model;
+    }
+
+    /**
+     * returns the output mode
+     * @return the output mode
+     */
+    public SymCryptoPartType getOutputMode()
+    {
+        return mode;
+    }
+
+
+
+
+
 
 }

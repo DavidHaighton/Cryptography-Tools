@@ -126,6 +126,16 @@ public class SymmetricModel<Cipher, Key, Plain>
     }
 
     /**
+     * should be called at the beginning to sync the models data with the view
+     */
+    public void sync()
+    {
+        updateAllModelListeners(SymCryptoPartType.PLAIN,plain);
+        updateAllModelListeners(SymCryptoPartType.KEY,key);
+        updateAllModelListeners(SymCryptoPartType.CIPHER,cipher);
+    }
+
+    /**
      * adds model listener to listen for when the model changes
      * @param listener listener
      */
