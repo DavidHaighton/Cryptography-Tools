@@ -1,4 +1,4 @@
-package Core;
+package Displays;
 
 import javax.swing.border.TitledBorder;
 import javax.swing.*;

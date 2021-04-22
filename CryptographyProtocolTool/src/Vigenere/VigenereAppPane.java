@@ -1,5 +1,5 @@
 package Vigenere;
-import Core.AppPane;
+import Framework.AppPane;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

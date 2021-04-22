@@ -1,5 +1,5 @@
 package MonoAlphabetic;
-import Core.AppPane;
+import Framework.AppPane;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

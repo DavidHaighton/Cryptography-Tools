@@ -1,5 +1,5 @@
 package FrequencyAnalyzer;
-import Core.AppPane;
+import Framework.AppPane;
 
 import java.util.*;
 import javax.swing.*;

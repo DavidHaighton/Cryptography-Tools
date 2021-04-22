@@ -1,10 +1,8 @@
 package CaesarCipher;
 
-import Core.*;
-
 import java.util.*;
 
-public class CaesarAlgorithm implements CryptoAlgo<String,String,String>
+public class CaesarAlgorithm implements SymmetricAlgorithm<String,String,String>
 {
     private static final int NEXT=1,PREV=-1;
     private static final String NO_OUTPUT="";

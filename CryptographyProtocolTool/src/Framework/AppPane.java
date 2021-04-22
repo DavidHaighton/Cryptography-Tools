@@ -1,6 +1,5 @@
-package Core;
+package Framework;
 
-import CaesarCipher.CaesarPane;
 import FrequencyAnalyzer.AnalyzerPane;
 import MonoAlphabetic.MonoAlphabeticPane;
 import Playfair.PlayfairPane;
@@ -113,8 +112,7 @@ public abstract class AppPane extends JComponent
             new AnalyzerPane(),
             new MonoAlphabeticPane(),
             new PlayfairPane(),
-            new VigenereAppPane(),
-            new CaesarPane()
+            new VigenereAppPane()
     };
 
 }
