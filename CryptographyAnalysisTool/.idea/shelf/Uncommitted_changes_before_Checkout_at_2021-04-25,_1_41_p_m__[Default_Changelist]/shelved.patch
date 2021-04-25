@@ -1,0 +1,105 @@
+Index: src/Vigenere/VigenereGuessPopup.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Vigenere;\nimport javax.swing.*;\nimport java.awt.*;\nimport java.awt.event.WindowAdapter;\nimport java.awt.event.WindowEvent;\nimport java.io.CharArrayReader;\nimport java.util.*;\nimport java.util.List;\n\npublic class VigenereGuessPopup\n{\n    private  List<Character> populationPlainLetters = new ArrayList<>(7);\n    JFrame frame;\n\n    public VigenereGuessPopup()\n    {\n        setupLogic();\n\n        frame = new JFrame(\"Guesser Helper\");\n        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);\n        frame.addWindowListener(\n                new WindowAdapter() {\n                    @Override\n                    public void windowClosing(WindowEvent e) {\n                        frame.removeAll();\n                    }\n                }\n        );\n        frame.setSize(500,250);\n        frame.setVisible(false);\n    }\n\n    public void show(String cipher)\n    {\n        int keyLength=0;\n        if(keyLength==cipher.length())\n        {\n            JOptionPane.showMessageDialog(null,\"NO TEXT TO ANALYZE\",\"ERROR\",JOptionPane.ERROR_MESSAGE);\n            return;\n        }\n\n        try {\n            keyLength=Integer.parseInt(JOptionPane.showInputDialog(\"How Many characters in your key?\", \"\"));\n        }catch(Exception e)\n        {\n            JOptionPane.showMessageDialog(null,\"NOT A NUMBER\",\"ERROR\",JOptionPane.ERROR_MESSAGE);\n            return;\n        }\n        if(keyLength*3>cipher.length())\n        {\n            JOptionPane.showMessageDialog(null,\"NOT A BIG ENOUGH NUMBER\",\"ERROR\",JOptionPane.ERROR_MESSAGE);\n            return;\n        }\n\n        List<Character> topCharacters = new ArrayList<>(keyLength);\n        List<String> parts = generateCipherParts(cipher,keyLength);\n        for(String part:parts)\n        {\n            topCharacters.add(generateTopCharacter(part));\n        }\n\n        showWindow(topCharacters);\n\n    }\n\n    private void showWindow(List<Character> topCharacters)\n    {\n        frame.setLayout(new GridLayout(topCharacters.size()+1,populationPlainLetters.size()+1));\n        frame.add(new JPanel());//fill top left with nothing\n        for(char c:populationPlainLetters)\n        {\n            JPanel panel = new JPanel();\n            panel.setBackground(Color.ORANGE);\n            JLabel label = new JLabel(c+\"\");\n            panel.add(label);\n            frame.add(panel);\n        }\n\n        Color rowColor = Color.lightGray;\n        for(char cipher: topCharacters)\n        {\n            JPanel temppanel = new JPanel();\n            temppanel.setBackground(Color.red);\n            JLabel label = new JLabel(cipher+\"\");\n            temppanel.add(label);\n            frame.add(temppanel);\n            for(char plain: populationPlainLetters)\n            {\n                temppanel = new JPanel();\n                temppanel.setBackground(rowColor);\n                JLabel keyLabel = new JLabel(getKeyChar(cipher,plain)+\"\");\n                //keyLabel.setFont(new Font());\n                temppanel.add(keyLabel);\n                frame.add(temppanel);\n            }\n            rowColor = rowColor==Color.lightGray?Color.WHITE:Color.lightGray;\n        }\n\n        frame.setVisible(true);\n\n    }\n\n\n    private char getKeyChar(char cipher, char plain)\n    {\n        return (char)((cipher-plain+26)%26+'a');\n    }\n\n    private List<String> generateCipherParts(String cipher, int keyLength)\n    {\n        char[] chars = cipher.toCharArray();\n        List<StringBuilder> builders = new ArrayList<>(keyLength);\n        int size = (int)Math.ceil(chars.length/keyLength);\n        for(int i=0;i<keyLength;i++)\n        {\n            builders.add(new StringBuilder(size));\n        }\n\n        for(int i=0;i<chars.length;i++)\n        {\n            builders.get(i%keyLength).append(chars[i]);\n        }\n        List<String> output = new ArrayList<>(keyLength);\n        for(StringBuilder builder: builders)\n        {\n            output.add(builder.toString());\n        }\n        return output;\n\n    }\n    private char generateTopCharacter(String cipherParts)\n    {\n        //make histogram\n        Map<Character,Integer> map = new HashMap<>(26);\n        for(char character: cipherParts.toCharArray())\n        {\n            if(character>'z'||character<'a')\n            {\n                continue;\n            }\n            map.putIfAbsent(character,0);\n            map.put(character,map.get(character)+1);\n        }\n        //find max\n        FreqMapping charFreq = new FreqMapping('a',0);\n        for(Map.Entry<Character,Integer> entry: map.entrySet())\n        {\n            if(charFreq.getFrequency()<entry.getValue())\n            {\n                charFreq = new FreqMapping(entry.getKey(),entry.getValue());\n            }\n        }\n        return charFreq.character;\n\n    }\n\n\n    private void setupLogic()\n    {\n        Scanner reader = new Scanner(getClass().getResourceAsStream(\"/Resources/letter_histogram.txt\"));\n        List<FreqMapping> mapping = new ArrayList<>(26);\n        while(reader.hasNextLine())\n        {\n            String[] sides = reader.nextLine().split(\":\");\n            char letter = sides[0].charAt(0);\n            float frequency = Float.parseFloat(sides[1]);\n            mapping.add(new FreqMapping(letter,frequency));\n        }\n        Collections.sort(mapping);\n        for(int i =1;i<8; i++)\n        {\n            populationPlainLetters.add(mapping.get(mapping.size()-i).character);\n        }\n    }\n\n    public void hide()\n    {\n        frame.setVisible(false);\n    }\n\n    private class FreqMapping implements Comparable<FreqMapping>\n    {\n        private final float frequency;\n        private final char character;\n        public FreqMapping(char character, float frequency)\n        {\n            this.frequency = frequency;\n            this.character = character;\n        }\n\n        public float getFrequency()\n        {\n            return frequency;\n        }\n        public char getCharacter()\n        {\n            return character;\n        }\n\n        @Override\n        public int compareTo(FreqMapping o)\n        {\n            if(this.frequency<o.frequency)\n            {\n                return -1;\n            }\n            else if(this.frequency==o.frequency)\n            {\n                return 0;\n            }\n            return 1;\n        }\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Vigenere/VigenereGuessPopup.java b/src/Vigenere/VigenereGuessPopup.java
+--- a/src/Vigenere/VigenereGuessPopup.java	(revision 0a3ef973ee2f7eab9c55cb0a3b623bc0d0a32e1b)
++++ b/src/Vigenere/VigenereGuessPopup.java	(date 1619213206743)
+@@ -12,12 +12,12 @@
+     private  List<Character> populationPlainLetters = new ArrayList<>(7);
+     JFrame frame;
+ 
+-    public VigenereGuessPopup()
++    public VigenereGuessPopup(String cipher)
+     {
+         setupLogic();
+ 
+         frame = new JFrame("Guesser Helper");
+-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
++        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+         frame.addWindowListener(
+                 new WindowAdapter() {
+                     @Override
+@@ -26,11 +26,13 @@
+                     }
+                 }
+         );
++        show(cipher);
++
+         frame.setSize(500,250);
+-        frame.setVisible(false);
++        frame.setVisible(true);
+     }
+ 
+-    public void show(String cipher)
++    private void show(String cipher)
+     {
+         int keyLength=0;
+         if(keyLength==cipher.length())
+@@ -103,6 +105,10 @@
+ 
+     private char getKeyChar(char cipher, char plain)
+     {
++        if(cipher>='A' || cipher<='Z')
++        {
++
++        }
+         return (char)((cipher-plain+26)%26+'a');
+     }
+ 
+Index: src/Vigenere/VigenereAppPane.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Vigenere;\nimport Core.AppPane;\n\nimport javax.swing.*;\nimport javax.swing.border.TitledBorder;\nimport javax.swing.event.DocumentEvent;\nimport javax.swing.event.DocumentListener;\nimport java.awt.*;\n\npublic class VigenereAppPane extends AppPane implements PlainTextView\n{\n    private VigenereDecoderModel vigenereDecoderModel = new VigenereDecoderModel();\n    private VigenereGuessPopup popup = new VigenereGuessPopup();\n\n    private JPanel keyPanel = new JPanel(), knownPanel = new JPanel();\n    private TitledBorder keyBorder = new TitledBorder(\"Key\"),\n        cipherBorder = new TitledBorder(\"Cipher\"),\n        plainBorder = new TitledBorder(\"Plain Text\");\n\n    private JButton guesserButton = new JButton(\"Guesser\");\n\n    private JTextArea cipherTextArea = new JTextArea(),\n            plainTextArea = new JTextArea();\n    private JTextField keyField = new JTextField();\n    private JSpinner offsetSpinner = new JSpinner();\n\n    private JScrollPane cipherScrollPane = new JScrollPane(cipherTextArea),\n            plainScrollPane = new JScrollPane(plainTextArea);\n    public VigenereAppPane()\n    {\n        super(\"Vigenere\",\"Vigenere Tool\");\n        vigenereDecoderModel.addPlainTextView(this);\n        this.setLayout(new GridLayout(1,2,2,0));\n        this.setBackground(Color.BLACK);\n\n        //menu bar\n        this.addMenu(guesserButton);\n        guesserButton.addActionListener(e->\n        {\n            popup.show(cipherTextArea.getText());\n        });\n\n        //left side\n        this.add(knownPanel);\n        knownPanel.setLayout(new BorderLayout());\n        knownPanel.add(keyPanel,BorderLayout.NORTH);\n        keyPanel.setBorder(keyBorder);\n        keyPanel.setLayout(new BorderLayout());\n        keyPanel.add(keyField,BorderLayout.CENTER);\n        SpinnerNumberModel spinnerModel = new SpinnerNumberModel();\n        spinnerModel.setStepSize(1);\n        spinnerModel.setMinimum(0);\n\n        offsetSpinner.setModel(spinnerModel);\n        keyPanel.add(offsetSpinner, BorderLayout.EAST);\n\n        cipherScrollPane.setBorder(cipherBorder);\n        knownPanel.add(cipherScrollPane);\n        //right side\n        plainScrollPane.setBorder(plainBorder);\n        this.add(plainScrollPane);\n        plainTextArea.setEditable(false);\n\n        cipherTextArea.setLineWrap(true);\n        plainTextArea.setLineWrap(true);\n\n        this.cipherTextArea.getDocument().addDocumentListener(new CipherHandler());\n        this.keyField.getDocument().addDocumentListener(new KeyHandler());\n        this.offsetSpinner.addChangeListener(e->{\n            vigenereDecoderModel.setKeyWrapOffset((int)offsetSpinner.getValue());});\n\n        setSize(600,300);\n        show();\n    }\n\n\n    @Override\n    public void plainTextUpdated(PlainUpdatedEvent evt)\n    {\n        this.plainTextArea.setText(evt.getPlainText());\n    }\n\n    public static void main(String[] args) {\n        new VigenereAppPane().showPopupFrame(JFrame.EXIT_ON_CLOSE);\n    }\n\n    @Override\n    public void setInFocus(boolean inFocus)\n    {\n        if(!inFocus)\n            popup.hide();\n\n    }\n\n    private class CipherHandler implements DocumentListener\n    {\n\n        @Override\n        public void insertUpdate(DocumentEvent e)\n        {\n            updateCipher();\n        }\n\n        @Override\n        public void removeUpdate(DocumentEvent e)\n        {\n            updateCipher();\n        }\n\n        @Override\n        public void changedUpdate(DocumentEvent e)\n        {\n            updateCipher();\n        }\n\n        private void updateCipher()\n        {\n            vigenereDecoderModel.setCipher(cipherTextArea.getText());\n            vigenereDecoderModel.updatePlain();\n        }\n    }\n\n    private class KeyHandler implements DocumentListener\n    {\n\n        @Override\n        public void insertUpdate(DocumentEvent e)\n        {\n            updateCipher();\n        }\n\n        @Override\n        public void removeUpdate(DocumentEvent e)\n        {\n            updateCipher();\n        }\n\n        @Override\n        public void changedUpdate(DocumentEvent e)\n        {\n            updateCipher();\n        }\n        private void updateCipher()\n        {\n            vigenereDecoderModel.setKey(keyField.getText());\n            vigenereDecoderModel.updatePlain();\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Vigenere/VigenereAppPane.java b/src/Vigenere/VigenereAppPane.java
+--- a/src/Vigenere/VigenereAppPane.java	(revision 0a3ef973ee2f7eab9c55cb0a3b623bc0d0a32e1b)
++++ b/src/Vigenere/VigenereAppPane.java	(date 1619226734716)
+@@ -10,13 +10,13 @@
+ public class VigenereAppPane extends AppPane implements PlainTextView
+ {
+     private VigenereDecoderModel vigenereDecoderModel = new VigenereDecoderModel();
+-    private VigenereGuessPopup popup = new VigenereGuessPopup();
+ 
+     private JPanel keyPanel = new JPanel(), knownPanel = new JPanel();
+     private TitledBorder keyBorder = new TitledBorder("Key"),
+         cipherBorder = new TitledBorder("Cipher"),
+         plainBorder = new TitledBorder("Plain Text");
+ 
++    private Font font = new Font(Font.MONOSPACED,Font.PLAIN,12);
+     private JButton guesserButton = new JButton("Guesser");
+ 
+     private JTextArea cipherTextArea = new JTextArea(),
+@@ -37,7 +37,7 @@
+         this.addMenu(guesserButton);
+         guesserButton.addActionListener(e->
+         {
+-            popup.show(cipherTextArea.getText());
++            new VigenereGuessPopup(cipherTextArea.getText().toLowerCase().replaceAll(" ","").replaceAll("\n",""));
+         });
+ 
+         //left side
+@@ -64,6 +64,9 @@
+         cipherTextArea.setLineWrap(true);
+         plainTextArea.setLineWrap(true);
+ 
++        cipherTextArea.setFont(font);
++        plainTextArea.setFont(font);
++
+         this.cipherTextArea.getDocument().addDocumentListener(new CipherHandler());
+         this.keyField.getDocument().addDocumentListener(new KeyHandler());
+         this.offsetSpinner.addChangeListener(e->{
+@@ -87,8 +90,6 @@
+     @Override
+     public void setInFocus(boolean inFocus)
+     {
+-        if(!inFocus)
+-            popup.hide();
+ 
+     }
+ 
