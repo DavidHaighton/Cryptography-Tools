@@ -1,53 +1,108 @@
 package Framework;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class Model<Data extends CryptoData>
+/**
+ * The core MVC model of the application.
+ * It works with all algorithms and Views
+ */
+public class Model
 {
-    private final List<ModelListener<Data>> listeners = new ArrayList<>(1);
-    private final CryptoAlgorithm<Data> algorithm;
-    private Data storedData;
+    private final CryptoAlgorithm algorithm;
+    private List<AnalysisView> views =new ArrayList<>(3);
+    private Map<String,String> data = new HashMap<>();
 
-    public Model(CryptoAlgorithm<Data> algorithm)
+    private String mode;
+
+    /**
+     * constructs the model off of the algorithm
+     * @param algorithm the algorithm
+     */
+    public Model(final CryptoAlgorithm algorithm)
     {
         this.algorithm = algorithm;
+        mode = algorithm.getModes()[0];
     }
 
-
-    public final void sync()
+    /**
+     * sets the mode of the model
+     * @param mode the mode of the model
+     */
+    public final void setMode(String mode)
     {
-        storedData = algorithm.getDefaultState();
-        notifyAllListeners(storedData);
+        this.mode = mode;
     }
 
-    public final void updateModelData(String type, Object data)
+    /**
+     * returns the mode of the model
+     * @return the mode of the model
+     */
+    public final String getMode()
     {
-        storedData.getData().put(type, data);
-        storedData = algorithm.solveFor(storedData);
-        notifyAllListeners(storedData);
+        return this.mode;
     }
 
-    public final CryptoAlgorithm<Data> getAlgorithm()
+    /**
+     * updates the data in the model and solves for the mode
+     * @param key the type of data
+     * @param value the value of the data
+     */
+    public final void updateData(final String key, final String value)
     {
-        return algorithm;
+        this.data.put(key,value);
+        this.data=this.algorithm.completeData(this.data, this.getMode());
+        updateAllViews();
     }
 
-    public final void addModelChangeListener(ModelListener<Data> listener)
+    /**
+     * returns the data value for the type
+     * @param key the type
+     * @return the data value
+     */
+    public final String getData(final String key)
     {
-        listeners.add(listener);
+        return this.data.get(key);
     }
 
-    public final void removeModelChangeListener(ModelListener<Data> listener)
+    /**
+     * updates all views at once saying data changed
+     */
+    private final void updateAllViews()
     {
-        listeners.remove(listener);
-    }
-
-    protected final void notifyAllListeners(Data data)
-    {
-        ModelEvent<Data> event = new ModelEvent<>(this,data);
-        for(ModelListener<Data> listener:listeners)
+        AnalyzedEvent event = new AnalyzedEvent(this);
+        for(AnalysisView view: views)
         {
-            listener.modelChanged(event);
+            view.dataUpdated(event);
         }
+    }
+
+    /**
+     * add a view to the model
+     * @param view the view to add
+     */
+    public final void addView(final AnalysisView view)
+    {
+        views.add(view);
+    }
+
+    /**
+     * remove a view from the model
+     * @param view the view to remove
+     */
+    public final void removeView(AnalysisView view)
+    {
+        views.remove(view);
+    }
+
+    /**
+     * get the algorithm the model is using
+     * @return the algorithm the model is using
+     */
+    public final CryptoAlgorithm getAlgorithm()
+    {
+        return this.algorithm;
     }
 }

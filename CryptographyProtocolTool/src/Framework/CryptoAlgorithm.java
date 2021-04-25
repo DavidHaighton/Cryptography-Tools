@@ -1,37 +1,76 @@
 package Framework;
 
-import java.util.Set;
+import java.util.Map;
 
-public interface CryptoAlgorithm<Data extends CryptoData>
+/**
+ * The algorithm class all cryptography algorithm classes must inherit
+ */
+public abstract class CryptoAlgorithm
 {
-    /**
-     * Given the data from the model, the Crypto-Algorithm will solve for the requested data in the data object
-     * @param data the data to perform calculations on
-     * @return the complete data object
-     */
-    public Data solveFor(Data data);
+    private final String name;
+    protected Map<String,String> data;
+    public CryptoAlgorithm(String name)
+    {
+        this.name = name;
+    }
+    protected String mode;
+
+    protected abstract void solve();
+
+    protected abstract boolean isValidInput();
 
     /**
-     * returns the initial state of the application
-     * @return the initial state of the application
+     * Called to solve for one of the data points in the map. The mode specifies which
+     * @param data all the data input
+     * @param mode what to solve for
+     * @return the new map with a solution
      */
-    public Data getDefaultState();
+    public final Map<String,String> completeData(Map<String,String> data, String mode)
+    {
+        this.mode = mode;
+        this.data = data;
+        unWrapData();
+        if(isValidInput())
+        {
+            solve();
+        }
+        wrapData();
+        return this.data;
+    }
 
     /**
-     * returns a set of the valid tasks/modes that the algorithm can perfom
-     * @return the set of valid modes for the algorithm
+     * Used to unwrap the data from the map into easier to manage variables
      */
-    public Set<String> getValidModes();
+    protected abstract  void unWrapData();
 
     /**
-     * returns the full name of the algorithm
-     * @return the full name of the algorithm
+     * Used to wrap the easier to manage variables into the map
      */
-    public String getName();
+    protected abstract void wrapData();
+
 
     /**
-     * returns the short form of the name for the algorithm
-     * @return the short form of the name for the algorithm
+     * a method used to get a value from the data. If the value is null, the method changes it to an empty String
+     * @param type the key for the map
+     * @return either the value for the key or an empty string
      */
-    public String getShortName();
+    protected String getSafeText(String type)
+    {
+        return this.data.containsKey(type)?this.data.get(type):"";
+    }
+
+    /**
+     * Returns an array of acceptable modes for the given algorithm
+     * @return the modes the algorithm can be in
+     */
+    public abstract String[] getModes();
+
+    /**
+     * the name of the algorithm
+     * @return the name of the algorithm
+     */
+    public final String getName()
+    {
+        return this.name;
+    }
 }
